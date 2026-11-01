@@ -1,0 +1,8 @@
+build/
+dist/
+dependencies/
+*.user
+*.log
+ocr-debug.txt
+verification.txt
+
