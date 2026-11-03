@@ -1,4 +1,4 @@
-#define AppVersion "2.0.0"
+#define AppVersion "2.0.1"
 [Setup]
 AppId={{E07614A2-E43D-4EDC-922E-FAD2DB6A93BA}
 AppName=Prayer Times
@@ -45,8 +45,8 @@ Name: "{group}\Prayer Times"; Filename: "{app}\Prayer Times.exe"
 Name: "{group}\Uninstall Prayer Times"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\Prayer Times"; Filename: "{app}\Prayer Times.exe"; Tasks: desktop
 
-[Registry]
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "MarkazPrayerDisplay"; ValueData: """{app}\Prayer Times.exe"" --background"; Flags: uninsdeletevalue; Tasks: startup
+[UninstallRun]
+Filename: "{app}\Prayer Times.exe"; Parameters: "--disable-startup"; Flags: runhidden waituntilterminated; RunOnceId: "RemoveStartup"
 
 [Run]
 Filename: "{app}\Prayer Times.exe"; Parameters: "--background"; Description: "Start Prayer Times"; Flags: nowait postinstall skipifsilent
@@ -100,12 +100,16 @@ begin
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
-var DataPath, Config: String;
+var DataPath, Config, StartupArgument: String; StartupCode: Integer;
 begin
   if CurStep = ssPostInstall then begin
     DataPath := ExpandConstant('{localappdata}\MarkazPrayerTimes\Data'); ForceDirectories(DataPath);
     Config := '{"IdleEnabled":' + JsonBool('idle') + ',"MainsOnly":' + JsonBool('mains') + ',"AutoCheck":' + JsonBool('automatic') + ',"IdleMinutes":' + IdlePage.Values[0] + '}';
     SaveStringToFile(DataPath + '\settings.json', Config, False);
-    if not WizardIsTaskSelected('startup') then RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'MarkazPrayerDisplay');
+    if WizardIsTaskSelected('startup') then StartupArgument := '--enable-startup' else StartupArgument := '--disable-startup';
+    if not Exec(ExpandConstant('{app}\Prayer Times.exe'), StartupArgument, ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, StartupCode) then
+      MsgBox('Windows startup could not be configured. Open Prayer Times settings and enable Start quietly when I sign in to Windows.', mbError, MB_OK)
+    else if StartupCode <> 0 then
+      MsgBox('Windows startup could not be configured. Open Prayer Times settings and enable Start quietly when I sign in to Windows.', mbError, MB_OK);
   end;
 end;

@@ -53,6 +53,11 @@ static class Program {
     }
     [STAThread] public static void Main(string[] args) {
         Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
+        if(args.Contains("--enable-startup") || args.Contains("--disable-startup")) {
+            try { Startup.SetEnabled(args.Contains("--enable-startup")); }
+            catch(Exception) { Environment.Exit(1); }
+            return;
+        }
         if(args.Contains("--test")) { Environment.Exit(SelfTests.Run(args)); return; }
         string dataOverride=null;
         int dataIndex=Array.IndexOf(args,"--data-dir"); if(dataIndex>=0 && dataIndex+1<args.Length) dataOverride=args[dataIndex+1];
@@ -201,7 +206,7 @@ class IdleContext : ApplicationContext {
         menu.Items.Add("Check masjid website",null,async (s,e)=>await Tables.CheckAsync(true));
         menu.Items.Add("Settings…",null,(s,e)=> { using(var settings=new SettingsDialog()) settings.ShowDialog(); });
         menu.Items.Add("Open display folder",null,(s,e)=>System.Diagnostics.Process.Start("explorer.exe",Program.Folder));
-        menu.Items.Add("Disable startup and quit",null,(s,e)=> { using(var key=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run",true)) key.DeleteValue("MarkazPrayerDisplay",false); ExitThread(); });
+        menu.Items.Add("Disable startup and quit",null,(s,e)=> { try { Startup.SetEnabled(false); ExitThread(); } catch(Exception ex) { MessageBox.Show(ex.Message,"Unable to change startup"); } });
         menu.Items.Add("Quit for now",null,(s,e)=>ExitThread());
         tray=new NotifyIcon { Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath),Text="Prayer Times",ContextMenuStrip=menu,Visible=true };
         tray.DoubleClick+=(s,e)=>ShowDisplay();

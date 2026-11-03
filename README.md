@@ -4,7 +4,7 @@ A Windows 11 desktop timetable and automatic idle display for Markaz us-Sunnah, 
 
 ## Install and use
 
-Download `Prayer-Times-Setup-2.0.0.exe` from this project's Releases, then choose your options:
+Download `Prayer-Times-Setup-2.0.1.exe` from this project's Releases, then choose your options:
 
 - Start quietly when signing in to Windows.
 - Open automatically after a chosen idle delay (1–120 minutes).
@@ -16,6 +16,8 @@ Download `Prayer-Times-Setup-2.0.0.exe` from this project's Releases, then choos
 The installer targets Windows 11 x64. It installs per user, includes offline English image recognition and installs Microsoft's signed Visual C++ x64 runtime if missing (that prerequisite may request administrator approval). The app uses Windows' .NET Framework 4.8. No account, API key or cloud OCR is needed. This build is not code-signed; Windows may show an unknown-publisher warning. Signing is recommended before broad distribution.
 
 Click Prayer Times to open it immediately. Move the mouse or press a key to return. The tray menu provides **Settings**, **Attach timetable**, and **Check masjid website**. The missing-timetable screen stays open for interaction; press Escape to dismiss it. Windows locking and lid behavior remain in force.
+
+With **Start quietly when I sign in to Windows** selected (the installer default), Windows launches the background watcher after you sign in, without opening the full-screen timetable. You do not need to open the app first. Version 2.0.1 uses a **Prayer Times** shortcut in your Windows Startup folder, replacing the previous registry entry. Settings can enable or disable this, and uninstall removes it. If Windows startup was disabled, selecting the option and saving enables it again. Automatic display still follows your chosen idle delay and power preference; the default is five minutes while plugged in. It runs in your signed-in desktop, not before sign-in or on the lock screen.
 
 ## Monthly updates
 

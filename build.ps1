@@ -16,7 +16,7 @@ if (!(Test-Path 'dependencies\vc_redist.x64.exe')) { Invoke-WebRequest -UseBasic
 $sig=Get-AuthenticodeSignature 'dependencies\vc_redist.x64.exe'
 if ($sig.Status -ne 'Valid' -or $sig.SignerCertificate.Subject -notmatch 'O=Microsoft Corporation') { throw 'Microsoft runtime signature validation failed.' }
 $compiler=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-& $compiler /nologo /platform:x64 /target:winexe '/out:build\Prayer Times.exe' /win32icon:assets\prayer-times.ico /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /reference:build\Tesseract.dll src\*.cs
+& $compiler /nologo /platform:x64 /target:winexe '/out:build\Prayer Times.exe' /win32icon:assets\prayer-times.ico /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /reference:Microsoft.CSharp.dll /reference:build\Tesseract.dll src\*.cs
 if ($LASTEXITCODE -ne 0) { throw 'Compilation failed.' }
 Copy-Item assets\timetable.csv build\timetable.csv
 $test=Start-Process -FilePath (Join-Path $PSScriptRoot 'build\Prayer Times.exe') -ArgumentList '--test' -Wait -PassThru -WindowStyle Hidden

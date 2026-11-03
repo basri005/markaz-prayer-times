@@ -1,4 +1,6 @@
-# Verification — 2.0.0
+# Verification — 2.0.1
+
+Startup fix tested on 3 November 2026: installer created the per-user Startup shortcut with the installed executable, `--background` and its working directory; removed the legacy Run entry; launching that shortcut started one watcher with no main window. Enable/disable and uninstall cleanup passed. Existing application self-tests also passed. An actual Windows restart/sign-in was not performed, to avoid interrupting the user's session.
 
 Tested on the development Windows laptop on 1 November 2026.
 

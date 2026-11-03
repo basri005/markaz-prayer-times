@@ -36,9 +36,9 @@ class SettingsDialog : Form {
         var ac=new CheckBox {Text="Automatic idle display only while plugged in",Left=25,Top=110,Width=470,Checked=Tables.Settings.MainsOnly};
         var auto=new CheckBox {Text="Check the masjid website for new timetables",Left=25,Top=150,Width=470,Checked=Tables.Settings.AutoCheck};
         var startup=new CheckBox {Text="Start quietly when I sign in to Windows",Left=25,Top=190,Width=470};
-        using(var key=Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run")) startup.Checked=key!=null && key.GetValue("MarkazPrayerDisplay")!=null;
+        startup.Checked=Startup.Enabled;
         var save=new Button {Text="Save",Left=25,Top=310,Width=120,Height=35};
-        save.Click+=(s,e)=> { Tables.Settings.IdleEnabled=idle.Checked; Tables.Settings.MainsOnly=ac.Checked; Tables.Settings.AutoCheck=auto.Checked; Tables.Settings.IdleMinutes=(int)minutes.Value; Tables.SaveSettings(); using(var key=Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run")) { if(startup.Checked) key.SetValue("MarkazPrayerDisplay","\""+Application.ExecutablePath+"\" --background"); else key.DeleteValue("MarkazPrayerDisplay",false); } Close(); };
+        save.Click+=(s,e)=> { try { Startup.SetEnabled(startup.Checked); Tables.Settings.IdleEnabled=idle.Checked; Tables.Settings.MainsOnly=ac.Checked; Tables.Settings.AutoCheck=auto.Checked; Tables.Settings.IdleMinutes=(int)minutes.Value; Tables.SaveSettings(); Close(); } catch(Exception ex) { MessageBox.Show(ex.Message,"Unable to save settings"); } };
         Controls.AddRange(new Control[]{idle,new Label {Text="Idle delay (minutes)",Left=25,Top=68,Width=140},minutes,ac,auto,startup,new Label {Text="Checks start on the last day of the month, retry every six hours when needed, and catch up when the app next runs. Images are read locally.",Left=25,Top=235,Width=475,Height=60},save});
     }
 }
