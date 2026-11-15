@@ -28,6 +28,11 @@ static class SelfTests {
             Check(IdleContext.ShouldShow(300000,true,false,false,301) && !IdleContext.ShouldShow(299999,true,false,false,301) && !IdleContext.ShouldShow(400000,false,false,false,301) && !IdleContext.ShouldShow(400000,true,false,true,301),"idle, AC and lock conditions");
             Tables.Settings.IdleMinutes=2; Tables.Settings.MainsOnly=false;
             Check(IdleContext.ShouldShow(120000,false,false,false,121),"configurable idle and battery options");
+            Check(!IdleContext.ShouldShow(900000,true,false,false,900,true),"playing media blocks an otherwise due idle display");
+            Check(!IdleContext.ShouldShow(900000,true,false,false,0,false) && IdleContext.ShouldShow(900000,true,false,false,121,false),"full idle delay after playback ends");
+            Check(MediaActivity.IsPlaybackActive(Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing) && !MediaActivity.IsPlaybackActive(Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus.Paused) && !MediaActivity.IsPlaybackActive(Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus.Stopped),"playing blocks; paused and stopped media do not");
+            Check(MediaActivity.IsPresentationState(2) && MediaActivity.IsPresentationState(3) && MediaActivity.IsPresentationState(4) && !MediaActivity.IsPresentationState(5),"full-screen and presentation protection");
+            if(args.Contains("--media")) TestNativeMedia().GetAwaiter().GetResult();
             string csv=Tables.Serialize(Program.Days); bool refused=false;
             try { Tables.ParseCsv(csv.Replace("2026-11-01,05:15,05:30","2026-11-01,05:15,08:30")); } catch {refused=true;}
             Check(refused,"out-of-order OCR times rejected");
@@ -42,5 +47,29 @@ static class SelfTests {
             }
             File.WriteAllLines(Path.Combine(Program.Folder,"verification.txt"),lines); return 0;
         } catch(Exception ex) { lines.Add(ex.ToString()); File.WriteAllLines(Path.Combine(Program.Folder,"verification.txt"),lines); return 1; }
+    }
+    static async System.Threading.Tasks.Task TestNativeMedia() {
+        bool baseline=await MediaActivity.ReadPlaybackAsync();
+        Check(true,"native Windows media-session query completed");
+        if(baseline) { lines.Add("SKIP: controlled media playback test: other media is playing"); return; }
+        string wave=Path.Combine(Path.GetTempPath(),"PrayerTimesMediaTest-"+Guid.NewGuid().ToString("N")+".wav");
+        using(var writer=new BinaryWriter(File.Create(wave))) {
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("RIFF")); writer.Write(16000+36); writer.Write(System.Text.Encoding.ASCII.GetBytes("WAVEfmt "));
+            writer.Write(16); writer.Write((short)1); writer.Write((short)1); writer.Write(8000); writer.Write(16000); writer.Write((short)2); writer.Write((short)16);
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("data")); writer.Write(16000); writer.Write(new byte[16000]);
+        }
+        try {
+            using(var source=Windows.Media.Core.MediaSource.CreateFromUri(new Uri(wave)))
+            using(var player=new Windows.Media.Playback.MediaPlayer()) {
+                player.Volume=0; player.IsLoopingEnabled=true; player.Source=source; player.Play();
+                bool detected=false;
+                for(int i=0;i<30;i++) { await System.Threading.Tasks.Task.Delay(200); if(await MediaActivity.ReadPlaybackAsync()) { detected=true; break; } }
+                Check(detected,"real muted Windows media playback detected");
+                player.Pause();
+                bool stopped=false;
+                for(int i=0;i<30;i++) { await System.Threading.Tasks.Task.Delay(200); if(!await MediaActivity.ReadPlaybackAsync()) { stopped=true; break; } }
+                Check(stopped,"paused Windows media releases suppression");
+            }
+        } finally { File.Delete(wave); }
     }
 }

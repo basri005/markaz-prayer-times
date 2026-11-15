@@ -16,7 +16,14 @@ if (!(Test-Path 'dependencies\vc_redist.x64.exe')) { Invoke-WebRequest -UseBasic
 $sig=Get-AuthenticodeSignature 'dependencies\vc_redist.x64.exe'
 if ($sig.Status -ne 'Valid' -or $sig.SignerCertificate.Subject -notmatch 'O=Microsoft Corporation') { throw 'Microsoft runtime signature validation failed.' }
 $compiler=Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-& $compiler /nologo /platform:x64 /target:winexe '/out:build\Prayer Times.exe' /win32icon:assets\prayer-times.ico /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /reference:Microsoft.CSharp.dll /reference:build\Tesseract.dll src\*.cs
+Get-Verified 'https://api.nuget.org/v3-flatcontainer/microsoft.windows.sdk.contracts/10.0.19041.1/microsoft.windows.sdk.contracts.10.0.19041.1.nupkg' 'dependencies\windows-contracts.zip' '7DC674587605F02B0B22266071834DD6E23EFAEED0D615C2A7F1C2601C18698D'
+Expand-Archive 'dependencies\windows-contracts.zip' 'dependencies\windows-contracts' -Force
+$framework=Split-Path $compiler
+Get-Verified 'https://api.nuget.org/v3-flatcontainer/microsoft.netframework.referenceassemblies.net48/1.0.3/microsoft.netframework.referenceassemblies.net48.1.0.3.nupkg' 'dependencies\net48.zip' '8A7E348538E7EB91351696911689F49E3D4F63F8BAB517432BBE159B8B1104A2'
+Expand-Archive 'dependencies\net48.zip' 'dependencies\net48' -Force
+$facades=Get-ChildItem 'dependencies\net48\build\.NETFramework\v4.8\Facades\*.dll' | ForEach-Object { '/reference:'+$_.FullName }
+$winrt=@(('/reference:'+(Join-Path $framework 'System.Runtime.WindowsRuntime.dll')),'/reference:dependencies\windows-contracts\ref\netstandard2.0\Windows.Foundation.FoundationContract.winmd','/reference:dependencies\windows-contracts\ref\netstandard2.0\Windows.Foundation.UniversalApiContract.winmd')
+& $compiler /nologo /platform:x64 /target:winexe '/out:build\Prayer Times.exe' /win32icon:assets\prayer-times.ico /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Web.Extensions.dll /reference:Microsoft.CSharp.dll /reference:build\Tesseract.dll $winrt $facades src\*.cs
 if ($LASTEXITCODE -ne 0) { throw 'Compilation failed.' }
 Copy-Item assets\timetable.csv build\timetable.csv
 $test=Start-Process -FilePath (Join-Path $PSScriptRoot 'build\Prayer Times.exe') -ArgumentList '--test' -Wait -PassThru -WindowStyle Hidden

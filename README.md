@@ -4,7 +4,7 @@ A Windows 11 desktop timetable and automatic idle display for Markaz us-Sunnah, 
 
 ## Install and use
 
-Download `Prayer-Times-Setup-2.0.1.exe` from this project's Releases, then choose your options:
+Download `Prayer-Times-Setup-2.0.2.exe` from this project's Releases, then choose your options:
 
 - Start quietly when signing in to Windows.
 - Open automatically after a chosen idle delay (1–120 minutes).
@@ -18,6 +18,12 @@ The installer targets Windows 11 x64. It installs per user, includes offline Eng
 Click Prayer Times to open it immediately. Move the mouse or press a key to return. The tray menu provides **Settings**, **Attach timetable**, and **Check masjid website**. The missing-timetable screen stays open for interaction; press Escape to dismiss it. Windows locking and lid behavior remain in force.
 
 With **Start quietly when I sign in to Windows** selected (the installer default), Windows launches the background watcher after you sign in, without opening the full-screen timetable. You do not need to open the app first. Version 2.0.1 uses a **Prayer Times** shortcut in your Windows Startup folder, replacing the previous registry entry. Settings can enable or disable this, and uninstall removes it. If Windows startup was disabled, selecting the option and saving enables it again. Automatic display still follows your chosen idle delay and power preference; the default is five minutes while plugged in. It runs in your signed-in desktop, not before sign-in or on the lock screen.
+
+## Watching videos and movies
+
+Automatic display pauses while Windows reports any media session as playing, including muted playback and reported music/audio. Full-screen apps and Windows presentation mode also suppress it. Once playback stops or pauses and full-screen mode ends, the normal idle delay starts again. Clicking Prayer Times still opens it immediately.
+
+Playback state is checked locally every two seconds using Windows media controls. No titles, URLs, screen images or history are collected. Players that do not report playback to Windows may not be detected in a smaller window; full-screen protection still applies. A paused player left full-screen continues to suppress the display. The tray's Pause automatic display option remains available for unsupported players.
 
 ## Monthly updates
 

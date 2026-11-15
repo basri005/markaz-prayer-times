@@ -1,4 +1,6 @@
-# Verification — 2.0.1
+# Verification — 2.0.2
+
+Media protection tested on 15 November 2026: checks passed for playback suppression, paused/stopped states, full idle delay after playback and full-screen/presentation states. The native Windows media query succeeded and detected existing playback on the laptop. The controlled play/pause test was skipped because other media was already playing; the user's playback was not changed. No end-to-end movie-length idle session or every browser/player combination was tested. `--test --media` runs an additional muted native media test when no other session is playing.
 
 Startup fix tested on 3 November 2026: installer created the per-user Startup shortcut with the installed executable, `--background` and its working directory; removed the legacy Run entry; launching that shortcut started one watcher with no main window. Enable/disable and uninstall cleanup passed. Existing application self-tests also passed. An actual Windows restart/sign-in was not performed, to avoid interrupting the user's session.
 

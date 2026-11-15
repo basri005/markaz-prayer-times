@@ -218,15 +218,21 @@ class IdleContext : ApplicationContext {
         if(e.Reason==SessionSwitchReason.SessionLock || e.Reason==SessionSwitchReason.SessionLogoff || e.Reason==SessionSwitchReason.ConsoleDisconnect || e.Reason==SessionSwitchReason.RemoteDisconnect) { locked=true; if(display!=null) display.Close(); }
         if(e.Reason==SessionSwitchReason.SessionUnlock || e.Reason==SessionSwitchReason.ConsoleConnect || e.Reason==SessionSwitchReason.RemoteConnect) { locked=false; dismissed=DateTime.UtcNow; }
     }
-    public static bool ShouldShow(uint idle,bool ac,bool paused,bool locked,double sinceDismiss) { return Tables.Settings.IdleEnabled && idle>=Tables.Settings.IdleMinutes*60000 && (ac || !Tables.Settings.MainsOnly) && !paused && !locked && sinceDismiss>=Tables.Settings.IdleMinutes*60; }
+    public static bool ShouldShow(uint idle,bool ac,bool paused,bool locked,double sinceDismiss,bool watching=false) { return Tables.Settings.IdleEnabled && idle>=Tables.Settings.IdleMinutes*60000 && (ac || !Tables.Settings.MainsOnly) && !paused && !locked && !watching && sinceDismiss>=Tables.Settings.IdleMinutes*60; }
     async void Tick(object sender,EventArgs e) {
         if(DateTime.UtcNow-lastCheck>TimeSpan.FromMinutes(1)) { lastCheck=DateTime.UtcNow; await Tables.CheckAsync(false); }
         if(showSignal.WaitOne(0)) ShowDisplay();
         LastInput info=new LastInput { size=(uint)Marshal.SizeOf(typeof(LastInput)) }; if(!GetLastInputInfo(ref info)) return;
         uint idle=unchecked((uint)Environment.TickCount-info.time);
         bool ac=SystemInformation.PowerStatus.PowerLineStatus==PowerLineStatus.Online;
+        await MediaActivity.RefreshAsync();
+        bool watching=MediaActivity.BlocksAutomaticDisplay || (display==null && MediaActivity.FullScreenOrPresentation());
+        if(watching) {
+            dismissed=DateTime.UtcNow; // Allow the full idle delay after playback ends.
+            if(display!=null && !manual && !display.Interactive) display.Close();
+        }
         if(display!=null) { if((!ac && !manual && Tables.Settings.MainsOnly) || locked || (!display.Interactive && idle<1000 && (DateTime.UtcNow-display.Opened).TotalSeconds>2)) display.Close(); }
-        else if(ShouldShow(idle,ac,paused,locked,(DateTime.UtcNow-dismissed).TotalSeconds)) { ShowDisplay(); manual=false; }
+        else if(ShouldShow(idle,ac,paused,locked,(DateTime.UtcNow-dismissed).TotalSeconds,watching)) { ShowDisplay(); manual=false; }
     }
     void ShowDisplay() {
         if(locked || display!=null) return;

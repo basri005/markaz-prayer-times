@@ -8,3 +8,7 @@
 - Inno Setup: https://jrsoftware.org — installer build tooling; not embedded as an application dependency. Generated setup/uninstaller retains its own copyright notices.
 
 License texts for OCR dependencies are included in `licenses/` and installed alongside the app. The mosque icon is original geometric artwork created for this project. Timetable values are factual data transcribed from the supplied masjid timetable; the masjid's logo, full poster, donation artwork and other website content are not bundled for redistribution.
+# Build-only Windows references
+
+The build downloads Microsoft.Windows.SDK.Contracts 10.0.19041.1 and Microsoft.NETFramework.ReferenceAssemblies.net48 1.0.3 from NuGet with SHA-256 verification. These reference files are used for compilation only and are not included in the installed app. Windows provides the media-control APIs at runtime. Refer to each NuGet package's license terms.
+
