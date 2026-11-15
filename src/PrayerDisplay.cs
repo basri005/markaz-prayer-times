@@ -226,7 +226,7 @@ class IdleContext : ApplicationContext {
         uint idle=unchecked((uint)Environment.TickCount-info.time);
         bool ac=SystemInformation.PowerStatus.PowerLineStatus==PowerLineStatus.Online;
         await MediaActivity.RefreshAsync();
-        bool watching=MediaActivity.BlocksAutomaticDisplay || (display==null && MediaActivity.FullScreenOrPresentation());
+        bool watching=MediaActivity.BlocksAutomaticDisplay;
         if(watching) {
             dismissed=DateTime.UtcNow; // Allow the full idle delay after playback ends.
             if(display!=null && !manual && !display.Interactive) display.Close();

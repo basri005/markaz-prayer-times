@@ -4,7 +4,7 @@ A Windows 11 desktop timetable and automatic idle display for Markaz us-Sunnah, 
 
 ## Install and use
 
-Download `Prayer-Times-Setup-2.0.2.exe` from this project's Releases, then choose your options:
+Download `Prayer-Times-Setup-2.0.3.exe` from this project's Releases, then choose your options:
 
 - Start quietly when signing in to Windows.
 - Open automatically after a chosen idle delay (1–120 minutes).
@@ -21,9 +21,9 @@ With **Start quietly when I sign in to Windows** selected (the installer default
 
 ## Watching videos and movies
 
-Automatic display pauses while Windows reports any media session as playing, including muted playback and reported music/audio. Full-screen apps and Windows presentation mode also suppress it. Once playback stops or pauses and full-screen mode ends, the normal idle delay starts again. Clicking Prayer Times still opens it immediately.
+Automatic display pauses while Windows reports any media session as playing, including muted playback and reported music/audio. Once playback stops or pauses, the normal idle delay starts again. A paused video, including one in another or full-screen window, does not suppress it. Clicking Prayer Times still opens it immediately.
 
-Playback state is checked locally every two seconds using Windows media controls. No titles, URLs, screen images or history are collected. Players that do not report playback to Windows may not be detected in a smaller window; full-screen protection still applies. A paused player left full-screen continues to suppress the display. The tray's Pause automatic display option remains available for unsupported players.
+Playback state is checked locally every two seconds using Windows media controls. No titles, URLs, screen images or history are collected. Players that do not report playback to Windows may not be detected. The tray's Pause automatic display option remains available for unsupported players. Version 2.0.3 removes the blanket full-screen/presentation block introduced in 2.0.2, because it could keep suppressing the timetable without active playback.
 
 ## Monthly updates
 

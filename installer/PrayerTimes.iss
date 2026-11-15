@@ -1,4 +1,4 @@
-#define AppVersion "2.0.2"
+#define AppVersion "2.0.3"
 [Setup]
 AppId={{E07614A2-E43D-4EDC-922E-FAD2DB6A93BA}
 AppName=Prayer Times

@@ -5,7 +5,6 @@ using Windows.Media.Control;
 
 // Reads playback state only: no media titles, URLs, history or screen capture.
 static class MediaActivity {
-    [DllImport("shell32.dll")] static extern int SHQueryUserNotificationState(out int state);
     static GlobalSystemMediaTransportControlsSessionManager manager;
     static bool checking;
     static bool initialized;
@@ -14,10 +13,6 @@ static class MediaActivity {
     public static bool BlocksAutomaticDisplay { get { return !initialized || Playing; } }
     public static bool IsPlaybackActive(GlobalSystemMediaTransportControlsSessionPlaybackStatus status) {
         return status==GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
-    }
-    public static bool IsPresentationState(int state) { return state==2 || state==3 || state==4; }
-    public static bool FullScreenOrPresentation() {
-        int state; return SHQueryUserNotificationState(out state)==0 && IsPresentationState(state);
     }
     public static async Task<bool> ReadPlaybackAsync() {
         if(manager==null) {
@@ -41,7 +36,7 @@ static class MediaActivity {
         if(checking || DateTime.UtcNow<nextCheck) return;
         checking=true;
         try { Playing=await ReadPlaybackAsync(); }
-        catch { Playing=false; manager=null; } // Full-screen protection still applies if media reporting is unavailable.
+        catch { Playing=false; manager=null; }
         finally { initialized=true; nextCheck=DateTime.UtcNow.AddSeconds(2); checking=false; }
     }
 }

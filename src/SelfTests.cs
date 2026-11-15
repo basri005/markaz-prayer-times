@@ -31,7 +31,7 @@ static class SelfTests {
             Check(!IdleContext.ShouldShow(900000,true,false,false,900,true),"playing media blocks an otherwise due idle display");
             Check(!IdleContext.ShouldShow(900000,true,false,false,0,false) && IdleContext.ShouldShow(900000,true,false,false,121,false),"full idle delay after playback ends");
             Check(MediaActivity.IsPlaybackActive(Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing) && !MediaActivity.IsPlaybackActive(Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus.Paused) && !MediaActivity.IsPlaybackActive(Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus.Stopped),"playing blocks; paused and stopped media do not");
-            Check(MediaActivity.IsPresentationState(2) && MediaActivity.IsPresentationState(3) && MediaActivity.IsPresentationState(4) && !MediaActivity.IsPresentationState(5),"full-screen and presentation protection");
+            Check(IdleContext.ShouldShow(900000,true,false,false,900,MediaActivity.IsPlaybackActive(Windows.Media.Control.GlobalSystemMediaTransportControlsSessionPlaybackStatus.Paused)),"paused media permits due idle display regardless of window size");
             if(args.Contains("--media")) TestNativeMedia().GetAwaiter().GetResult();
             string csv=Tables.Serialize(Program.Days); bool refused=false;
             try { Tables.ParseCsv(csv.Replace("2026-11-01,05:15,05:30","2026-11-01,05:15,08:30")); } catch {refused=true;}
